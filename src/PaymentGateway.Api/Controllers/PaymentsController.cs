@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
+using PaymentGateway.Api.Enums;
 using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Services;
 
@@ -7,20 +7,19 @@ namespace PaymentGateway.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentsController : Controller
+public class PaymentsController(PaymentsRepository paymentsRepository, ILogger<PaymentsController> logger) : Controller
 {
-    private readonly PaymentsRepository _paymentsRepository;
-
-    public PaymentsController(PaymentsRepository paymentsRepository)
-    {
-        _paymentsRepository = paymentsRepository;
-    }
-
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<PostPaymentResponse?>> GetPaymentAsync(Guid id)
+    public ActionResult<GetPaymentResponse> GetPaymentAsync(Guid id)
     {
-        var payment = _paymentsRepository.Get(id);
+        PostPaymentResponse? payment = paymentsRepository.Get(id);
 
-        return new OkObjectResult(payment);
+        if (payment is not null && payment.Status != PaymentStatus.Rejected)
+        {
+            return new OkObjectResult(new GetPaymentResponse(payment));
+        }
+
+        logger.LogInformation("Payment not found for id {Id}", id);
+        return NotFound();
     }
 }
