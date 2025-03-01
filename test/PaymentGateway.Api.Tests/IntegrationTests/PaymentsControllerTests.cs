@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using PaymentGateway.Api.Controllers;
@@ -8,26 +7,26 @@ using PaymentGateway.Api.Enums;
 using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Services;
 
-namespace PaymentGateway.Api.Tests;
+namespace PaymentGateway.Api.Tests.IntegrationTests;
 
 public class PaymentsControllerTests
 {
     private readonly Random _random = new();
     private readonly HttpClient _client;
     private readonly PaymentsRepository _paymentsRepository = new();
-    
+
     private const string BaseUrl = "/api/Payments";
-    
+
     public PaymentsControllerTests()
     {
         WebApplicationFactory<PaymentsController> webApplicationFactory = new();
-        
+
         _client = webApplicationFactory.WithWebHostBuilder(builder =>
                 builder.ConfigureServices(services => ((ServiceCollection)services)
                     .AddSingleton(_paymentsRepository)))
             .CreateClient();
     }
-    
+
     [Theory]
     [InlineData(PaymentStatus.Authorized)]
     [InlineData(PaymentStatus.Declined)]
@@ -49,7 +48,7 @@ public class PaymentsControllerTests
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{payment.Id}");
         PostPaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PostPaymentResponse>();
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         paymentResponse.Should().NotBeNull();
@@ -60,11 +59,11 @@ public class PaymentsControllerTests
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{Guid.NewGuid()}");
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task Get_WhenPaymentRejected_Returns404()
     {
@@ -80,10 +79,10 @@ public class PaymentsControllerTests
             Status = PaymentStatus.Rejected
         };
         _paymentsRepository.Add(payment);
-        
+
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{Guid.NewGuid()}");
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
