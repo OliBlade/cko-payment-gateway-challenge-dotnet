@@ -1,5 +1,4 @@
-using PaymentGateway.Api.AcquiringBankAdapter;
-using PaymentGateway.Api.AcquiringBankClient;
+using PaymentGateway.Adapters.AcquiringBankAdapter;
 using PaymentGateway.Api.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

@@ -19,10 +19,9 @@ Feel free to change the structure of the solution, use a different test library 
 
 -------------------
 
-## Assumptions
+## Assumptions[README.md](README.md)
 - Based on the test description of the acquiring bank "It also performs some validation of the card information and then sends the payment details to the appropriate 3rd party organization for processing" it looks like
 the acquiring bank reaches out to other third parties for us. Therefore I have assumed we don't need multiple implementations of acquiring banks, ideally I would clarify this as part of refinement/ discovery.
-- The authorization_code returned from the acquiring bank is a GUID. 
 
 ## Steps Taken
 1. Solidify current implementation of retrieving payment:
@@ -44,3 +43,9 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 - Add tests for the acquiring bank adapter.
 - Add contracts for the acquiring bank adapter.
 
+3. Build the Payment domain model.
+- Update the model last four digits to be a string. This is in case the first digit is a 0. This assumes this api is not in use.
+- Move adapters into own project, new project for domain models.
+- Add tests for the domain models.
+- Update repository and controller to use the domain models.
+- Start work on the payment processor.

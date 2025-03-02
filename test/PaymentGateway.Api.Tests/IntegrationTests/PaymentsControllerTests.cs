@@ -6,6 +6,7 @@ using PaymentGateway.Api.Controllers;
 using PaymentGateway.Api.Enums;
 using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Services;
+using PaymentGateway.Domain;
 
 namespace PaymentGateway.Api.Tests.IntegrationTests;
 
@@ -33,16 +34,19 @@ public class PaymentsControllerTests
     public async Task Get_PaymentFound_ReturnsPayment(PaymentStatus paymentStatus)
     {
         // Arrange
-        PostPaymentResponse payment = new()
+        CardDetails cardDetails = new("2222405343248877", _random.Next(1, 12), _random.Next(2023, 2030), "123");
+        Money money = new(_random.Next(1, 10000), new Currency("GBP"));
+        Payment payment = new(cardDetails, money);
+
+        switch (paymentStatus)
         {
-            Id = Guid.NewGuid(),
-            ExpiryYear = _random.Next(2023, 2030),
-            ExpiryMonth = _random.Next(1, 12),
-            Amount = _random.Next(1, 10000),
-            CardNumberLastFour = _random.Next(1111, 9999),
-            Currency = "GBP",
-            Status = paymentStatus
-        };
+            case PaymentStatus.Authorized:
+                payment.Authorize(Guid.NewGuid());
+                break;
+            case PaymentStatus.Declined:
+                payment.Decline();
+                break;
+        }
         _paymentsRepository.Add(payment);
 
         // Act
@@ -68,16 +72,11 @@ public class PaymentsControllerTests
     public async Task Get_WhenPaymentRejected_Returns404()
     {
         // Arrange
-        PostPaymentResponse payment = new()
-        {
-            Id = Guid.NewGuid(),
-            ExpiryYear = _random.Next(2023, 2030),
-            ExpiryMonth = _random.Next(1, 12),
-            Amount = _random.Next(1, 10000),
-            CardNumberLastFour = _random.Next(1111, 9999),
-            Currency = "GBP",
-            Status = PaymentStatus.Rejected
-        };
+        CardDetails cardDetails = new("2222405343248877", _random.Next(1, 12), _random.Next(2023, 2030), "123");
+        Money money = new(_random.Next(1, 10000), new Currency("GBP"));
+        Payment payment = new(cardDetails, money);
+        payment.Reject();
+        
         _paymentsRepository.Add(payment);
 
         // Act

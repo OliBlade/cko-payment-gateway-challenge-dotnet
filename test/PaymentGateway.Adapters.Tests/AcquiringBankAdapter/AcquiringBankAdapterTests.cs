@@ -1,10 +1,11 @@
 using System.Net;
 using System.Text.Json;
 using Moq.Protected;
-using PaymentGateway.Api.AcquiringBankAdapter;
-using PaymentGateway.Api.AcquiringBankClient.Contracts;
+using PaymentGateway.Adapters.AcquiringBankAdapter;
+using PaymentGateway.Adapters.AcquiringBankAdapter.Contracts;
+using PaymentGateway.Domain;
 
-namespace PaymentGateway.Api.Tests.AcquiringBankAdapter;
+namespace PaymentGateway.Adapters.Tests.AcquiringBankAdapter;
 
 public class AcquiringBankAdapterTests
 {
@@ -12,12 +13,15 @@ public class AcquiringBankAdapterTests
     public async Task ProcessPayment_WithValidRequest_ReturnsResponse()
     {
         // Arrange
-        ProcessPaymentRequest request = new ("2222405343248877", "04/2025", "GBP", 100, "123");
+        CardDetails cardDetails = new ("2222405343248877", 4, 25, "123");
+        Money money = new (100, new Currency("GBP"));
+        
         ProcessPaymentResponse expectedResponse = new (true, Guid.NewGuid());
         IAcquiringBankAdapter acquiringBankAdapter = SetupAcquiringBankClient(HttpStatusCode.OK, expectedResponse);
+        CancellationToken cancellationToken = new();
 
         // Act
-        ProcessPaymentResponse response = (await acquiringBankAdapter.ProcessPayment(request))!;
+        ProcessPaymentResponse response = (await acquiringBankAdapter.ProcessPayment(cardDetails, money, cancellationToken))!;
 
         // Assert
         response.Should().NotBeNull();
@@ -32,10 +36,13 @@ public class AcquiringBankAdapterTests
     {
         // Arrange
         IAcquiringBankAdapter acquiringBankAdapter = SetupAcquiringBankClient(statusCode);
-        ProcessPaymentRequest request = new ("2222405343248877", "04/2025", "GBP", 100, "123");
-
+        CardDetails cardDetails = new ("2222405343248877", 4, 25, "123");
+        Money money = new (100, new Currency("GBP"));
+        
+        CancellationToken cancellationToken = new();
+        
         // Act
-        Func<Task> act = async () => await acquiringBankAdapter.ProcessPayment(request);
+        Func<Task> act = async () => await acquiringBankAdapter.ProcessPayment(cardDetails, money, cancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<HttpRequestException>();
@@ -61,6 +68,6 @@ public class AcquiringBankAdapterTests
             .Verifiable();
 
         HttpClient httpClient = new(messageHandlerMock.Object) { BaseAddress = new Uri("https://notreal.com") };
-        return new Api.AcquiringBankAdapter.AcquiringBankAdapter(httpClient);
+        return new Adapters.AcquiringBankAdapter.AcquiringBankAdapter(httpClient);
     }
 }

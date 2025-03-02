@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PaymentGateway.Api.Enums;
 using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Services;
+using PaymentGateway.Domain;
+using PaymentGateway.Domain.Enums;
 
 namespace PaymentGateway.Api.Controllers;
 
@@ -12,7 +13,7 @@ public class PaymentsController(PaymentsRepository paymentsRepository, ILogger<P
     [HttpGet("{id:guid}")]
     public ActionResult<GetPaymentResponse> GetPaymentAsync(Guid id)
     {
-        PostPaymentResponse? payment = paymentsRepository.Get(id);
+        Payment? payment = paymentsRepository.Get(id);
 
         if (payment is not null && payment.Status != PaymentStatus.Rejected)
         {
