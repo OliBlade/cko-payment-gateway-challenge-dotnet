@@ -8,14 +8,20 @@ public class AcquiringBankAdapter(HttpClient client) : IAcquiringBankAdapter
 {
     private const string PaymentsUri = "payments";
 
-    public async Task<ProcessPaymentResponse?> ProcessPayment(CardDetails cardDetails, Money money,
+    public async Task<AuthorizationResult> ProcessPayment(CardDetails cardDetails, Money money,
         CancellationToken cancellationToken)
     {
-        ProcessPaymentRequest request = new ProcessPaymentRequest(cardDetails.FullCardNumber,
+        ProcessPaymentRequest request = new (cardDetails.FullCardNumber,
             cardDetails.FormattedExpiryDate, money.Currency.Code, money.Amount, cardDetails.Cvv);
         
         HttpResponseMessage response = await client.PostAsJsonAsync(PaymentsUri, request, cancellationToken);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<ProcessPaymentResponse>(cancellationToken);
+        
+        ProcessPaymentResponse? processPaymentResponse = await response.Content.ReadFromJsonAsync<ProcessPaymentResponse>(cancellationToken);
+        if (processPaymentResponse == null)
+        {
+            throw new HttpRequestException("Response was null");
+        }
+        return new AuthorizationResult(processPaymentResponse.Authorized, processPaymentResponse.AuthorizationCode);
     }
 }

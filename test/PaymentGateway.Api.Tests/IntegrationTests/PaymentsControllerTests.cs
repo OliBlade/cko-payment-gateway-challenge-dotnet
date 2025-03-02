@@ -3,8 +3,9 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using PaymentGateway.Api.Controllers;
-using PaymentGateway.Api.Enums;
+using PaymentGateway.Api.Models.Enums;
 using PaymentGateway.Api.Models.Responses;
+using PaymentGateway.Api.Repositories;
 using PaymentGateway.Api.Services;
 using PaymentGateway.Domain;
 
@@ -14,7 +15,7 @@ public class PaymentsControllerTests
 {
     private readonly Random _random = new();
     private readonly HttpClient _client;
-    private readonly PaymentsRepository _paymentsRepository = new();
+    private readonly InMemoryPaymentsRepository _inMemoryPaymentsRepository = new();
 
     private const string BaseUrl = "/api/Payments";
 
@@ -24,7 +25,7 @@ public class PaymentsControllerTests
 
         _client = webApplicationFactory.WithWebHostBuilder(builder =>
                 builder.ConfigureServices(services => ((ServiceCollection)services)
-                    .AddSingleton(_paymentsRepository)))
+                    .AddSingleton<IPaymentsRepository>(_inMemoryPaymentsRepository)))
             .CreateClient();
     }
 
@@ -47,7 +48,7 @@ public class PaymentsControllerTests
                 payment.Decline();
                 break;
         }
-        _paymentsRepository.Add(payment);
+        await _inMemoryPaymentsRepository.Add(payment);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{payment.Id}");
@@ -77,7 +78,7 @@ public class PaymentsControllerTests
         Payment payment = new(cardDetails, money);
         payment.Reject();
         
-        _paymentsRepository.Add(payment);
+        _inMemoryPaymentsRepository.Add(payment);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{Guid.NewGuid()}");

@@ -1,4 +1,4 @@
-﻿using PaymentGateway.Api.Enums;
+﻿using PaymentGateway.Api.Models.Enums;
 using PaymentGateway.Domain;
 
 namespace PaymentGateway.Api.Models.Responses;
@@ -16,19 +16,11 @@ public class GetPaymentResponse
     public GetPaymentResponse(Payment payment)
     {
         Id = payment.Id;
-        Status = MapPaymentStatus(payment.Status);
+        Status = payment.Status.ToModelPaymentStatus();
         CardNumberLastFour = payment.CardDetails.CardNumberLastFour;
         ExpiryMonth = payment.CardDetails.ExpiryMonth;
         ExpiryYear = payment.CardDetails.ExpiryYear;
         Currency = payment.Amount.Currency.Code;
         Amount = payment.Amount.Amount;
     }
-
-    private PaymentStatus MapPaymentStatus(Domain.Enums.PaymentStatus status) => status switch
-    {
-        Domain.Enums.PaymentStatus.Authorized => PaymentStatus.Authorized,
-        Domain.Enums.PaymentStatus.Declined => PaymentStatus.Declined,
-        Domain.Enums.PaymentStatus.Rejected => PaymentStatus.Rejected,
-        _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
-    };
 }

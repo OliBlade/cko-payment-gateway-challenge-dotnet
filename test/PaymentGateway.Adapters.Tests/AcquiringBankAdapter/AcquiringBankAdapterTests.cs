@@ -21,7 +21,7 @@ public class AcquiringBankAdapterTests
         CancellationToken cancellationToken = new();
 
         // Act
-        ProcessPaymentResponse response = (await acquiringBankAdapter.ProcessPayment(cardDetails, money, cancellationToken))!;
+        AuthorizationResult response = (await acquiringBankAdapter.ProcessPayment(cardDetails, money, cancellationToken))!;
 
         // Assert
         response.Should().NotBeNull();

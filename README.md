@@ -43,9 +43,15 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 - Add tests for the acquiring bank adapter.
 - Add contracts for the acquiring bank adapter.
 
-3. Build the Payment domain model.
+3. Build the Payment domain model. Gives us fine control over the data and access:
 - Update the model last four digits to be a string. This is in case the first digit is a 0. This assumes this api is not in use.
 - Move adapters into own project, new project for domain models.
 - Add tests for the domain models.
 - Update repository and controller to use the domain models.
 - Start work on the payment processor.
+
+4. Add in the payment processor:
+- Tweak the result of the acquiring bank to be a bit more usable.
+- Add tests for the payment processor.
+- Give the repository an interface for testing purposes, and to later swap with a better storage solution.
+- Start work on the process payment endpoint.

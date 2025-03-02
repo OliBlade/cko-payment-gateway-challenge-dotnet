@@ -1,11 +1,26 @@
-﻿namespace PaymentGateway.Api.Models.Requests;
+﻿using System.Text.Json.Serialization;
 
-public class PostPaymentRequest
+using PaymentGateway.Domain;
+
+namespace PaymentGateway.Api.Models.Requests;
+
+public class PostPaymentRequest(
+    string cardNumber,
+    int expiryMonth,
+    int expiryYear,
+    string cvv,
+    string currency,
+    int amount)
 {
-    public int CardNumberLastFour { get; set; }
-    public int ExpiryMonth { get; set; }
-    public int ExpiryYear { get; set; }
-    public string Currency { get; set; }
-    public int Amount { get; set; }
-    public int Cvv { get; set; }
+    public string CardNumber { get; } = cardNumber;
+    public int ExpiryMonth { get; } = expiryMonth;
+    public int ExpiryYear { get; } = expiryYear;
+    public string Cvv { get; } = cvv;
+    
+    public string Currency { get; } = currency;
+    public int Amount { get; init; } = amount;
+
+
+    public CardDetails ToCardDetails() => new (CardNumber, ExpiryMonth, ExpiryYear, Cvv);
+    public Money ToMoney() => new (Amount, new Currency(currency));
 }
