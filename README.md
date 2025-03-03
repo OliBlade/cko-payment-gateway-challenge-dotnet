@@ -19,9 +19,13 @@ Feel free to change the structure of the solution, use a different test library 
 
 -------------------
 
-## Assumptions[README.md](README.md)
+[Requirements](https://github.com/cko-recruitment/#requirements)
+
+## Assumptions
 - Based on the test description of the acquiring bank "It also performs some validation of the card information and then sends the payment details to the appropriate 3rd party organization for processing" it looks like
 the acquiring bank reaches out to other third parties for us. Therefore I have assumed we don't need multiple implementations of acquiring banks, ideally I would clarify this as part of refinement/ discovery.
+
+
 
 ## Steps Taken
 1. Solidify current implementation of retrieving payment:
@@ -58,4 +62,5 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 
 5. Implement the process payment endpoint:
 - Get the integration tests working using the bank simulator.
-- Add in Fluent Validation.
+- Add in basic validation for the model.
+- Add in fluent validation to validate the payment. We need to separate this from the controller in case the payment is rejected.

@@ -1,5 +1,11 @@
+using System.Reflection;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+
 using PaymentGateway.Adapters;
 using PaymentGateway.Api;
+using PaymentGateway.Api.Controllers;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +16,26 @@ builder.Services.AddPaymentGatewayServices();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1",
+        new OpenApiInfo
+        {
+            Title = "My API - V1",
+            Version = "v1"
+        }
+    );
+
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(PaymentsController).Assembly.GetName().Name}.xml"));
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    // Disable typical problem details e.g type, title, status. Stops the default showing in swagger
+    // TODO review this.
+    options.SuppressMapClientErrors = true;
+});
+
 builder.Services.AddLogging();
 
 WebApplication app = builder.Build();

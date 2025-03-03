@@ -21,12 +21,12 @@ public class AcquiringBankAdapterTests
         CancellationToken cancellationToken = new();
 
         // Act
-        AuthorizationResult response = (await acquiringBankAdapter.ProcessPayment(cardDetails, money, cancellationToken))!;
+        AuthorizationResult response = (await acquiringBankAdapter.ProcessPayment(cardDetails, money, cancellationToken));
 
         // Assert
         response.Should().NotBeNull();
         response.Authorized.Should().Be(expectedResponse.Authorized);
-        response.AuthorizationCode.Should().Be(expectedResponse.AuthorizationCode);
+        response.AuthorizationCode.Should().Be(expectedResponse.AuthorizationCode!.Value);
     }
     
     [Theory]
