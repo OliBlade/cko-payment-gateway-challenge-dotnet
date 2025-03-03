@@ -3,17 +3,17 @@ using PaymentGateway.Domain;
 
 namespace PaymentGateway.Api.Models.Responses;
 
-public class PostPaymentResponse
+public class PaymentResponse
 {
-    public Guid Id { get; set; }
-    public PaymentStatus Status { get; set; }
-    public string CardNumberLastFour { get; set; }
-    public int ExpiryMonth { get; set; }
-    public int ExpiryYear { get; set; }
-    public string Currency { get; set; }
-    public int Amount { get; set; }
+    public Guid Id { get; }
+    public PaymentStatus Status { get; }
+    public string CardNumberLastFour { get; }
+    public int ExpiryMonth { get; }
+    public int ExpiryYear { get; }
+    public string Currency { get; }
+    public int Amount { get; }
     
-    public PostPaymentResponse(Payment payment)
+    public PaymentResponse(Payment payment)
     {
         Id = payment.Id;
         Status = payment.Status.ToModelPaymentStatus();

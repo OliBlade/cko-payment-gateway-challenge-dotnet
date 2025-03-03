@@ -12,15 +12,16 @@ namespace PaymentGateway.Api.Controllers;
 [ApiController]
 public class PaymentsController(IPaymentsRepository paymentsRepository, IPaymentProcessor paymentProcessor, ILogger<PaymentsController> logger) : Controller
 {
+    
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<GetPaymentResponse>> GetPaymentAsync(Guid id)
+    public async Task<ActionResult<PaymentResponse>> GetPaymentAsync(Guid id)
     {
         Payment? payment = await paymentsRepository.Get(id);
 
         if (payment is not null && payment.Status != PaymentStatus.Rejected)
         {
             logger.LogInformation("Payment found for id {Id} with status {status}", id, payment.Status);
-            return new OkObjectResult(new GetPaymentResponse(payment));
+            return new OkObjectResult(new PaymentResponse(payment));
         }
 
         logger.LogInformation("Payment not found for id {Id}", id);
@@ -28,10 +29,10 @@ public class PaymentsController(IPaymentsRepository paymentsRepository, IPayment
     }
     
     [HttpPost]
-    public async Task<ActionResult<PostPaymentResponse>> PostPaymentAsync([FromBody] PostPaymentRequest request)
+    public async Task<ActionResult<PaymentResponse>> PostPaymentAsync([FromBody] PostPaymentRequest request, CancellationToken cancellationToken)
     {
-        Payment payment = await paymentProcessor.ProcessPayment(request.ToCardDetails(), request.ToMoney(), HttpContext.RequestAborted);
+        Payment payment = await paymentProcessor.ProcessPayment(request.ToCardDetails(), request.ToMoney(), cancellationToken);
         logger.LogInformation("Payment processed with status {status}", payment.Status);
-        return new OkObjectResult(new PostPaymentResponse(payment));
+        return new OkObjectResult(new PaymentResponse(payment));
     }
 }

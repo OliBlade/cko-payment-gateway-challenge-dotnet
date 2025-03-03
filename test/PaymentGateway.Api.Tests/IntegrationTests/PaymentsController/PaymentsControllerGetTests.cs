@@ -1,34 +1,12 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using PaymentGateway.Api.Controllers;
 using PaymentGateway.Api.Models.Enums;
-using PaymentGateway.Api.Models.Responses;
-using PaymentGateway.Api.Repositories;
-using PaymentGateway.Api.Services;
 using PaymentGateway.Domain;
 
-namespace PaymentGateway.Api.Tests.IntegrationTests;
+namespace PaymentGateway.Api.Tests.IntegrationTests.PaymentsController;
 
-public class PaymentsControllerTests
+public class PaymentsControllerGetTests : IntegrationTestBase
 {
-    private readonly Random _random = new();
-    private readonly HttpClient _client;
-    private readonly InMemoryPaymentsRepository _inMemoryPaymentsRepository = new();
-
-    private const string BaseUrl = "/api/Payments";
-
-    public PaymentsControllerTests()
-    {
-        WebApplicationFactory<PaymentsController> webApplicationFactory = new();
-
-        _client = webApplicationFactory.WithWebHostBuilder(builder =>
-                builder.ConfigureServices(services => ((ServiceCollection)services)
-                    .AddSingleton<IPaymentsRepository>(_inMemoryPaymentsRepository)))
-            .CreateClient();
-    }
-
     [Theory]
     [InlineData(PaymentStatus.Authorized)]
     [InlineData(PaymentStatus.Declined)]
@@ -52,7 +30,7 @@ public class PaymentsControllerTests
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{payment.Id}");
-        PostPaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PostPaymentResponse>();
+        PaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>();
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

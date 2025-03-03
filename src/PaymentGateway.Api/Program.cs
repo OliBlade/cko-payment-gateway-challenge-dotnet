@@ -1,22 +1,17 @@
-using PaymentGateway.Adapters.AcquiringBankAdapter;
-using PaymentGateway.Api.Repositories;
-using PaymentGateway.Api.Services;
+using PaymentGateway.Adapters;
+using PaymentGateway.Api;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-builder.Services.AddHttpClient<IAcquiringBankAdapter, AcquiringBankAdapter>(client =>
-    client.BaseAddress = builder.Configuration.GetSection("AcquiringBank:BaseUrl").Get<Uri>());
+builder.Services.AddAdapters(builder.Configuration);
+builder.Services.AddPaymentGatewayServices();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
-
-builder.Services.AddSingleton<IPaymentsRepository, InMemoryPaymentsRepository>();
-builder.Services.AddSingleton<IPaymentProcessor, PaymentProcessor>();
 
 WebApplication app = builder.Build();
 

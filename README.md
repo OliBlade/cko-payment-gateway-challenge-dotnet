@@ -55,3 +55,7 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 - Add tests for the payment processor.
 - Give the repository an interface for testing purposes, and to later swap with a better storage solution.
 - Start work on the process payment endpoint.
+
+5. Implement the process payment endpoint:
+- Get the integration tests working using the bank simulator.
+- Add in Fluent Validation.
