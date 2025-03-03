@@ -36,18 +36,19 @@ public class PaymentsController(IPaymentsRepository paymentsRepository, IPayment
         logger.LogInformation("Payment not found for id {Id}", id);
         return NotFound();
     }
-    
+
     /// <summary>
     /// Processes a payment
     /// </summary>
     /// <returns>Payment info</returns>
     /// <param name="request">The payment request including card and payment details</param>
+    /// <param name="cancellationToken"></param>
     /// <response code="200">Payment Authorized</response>
     /// <response code="400">The payment has been rejected due to invalid properties</response>
     /// <response code="402">The payment has been declined</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentResponse))]
-    [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
+    [ProducesResponseType(StatusCodes.Status402PaymentRequired, Type = typeof(PaymentResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PaymentResponse>> PostPaymentAsync([FromBody] PostPaymentRequest request, CancellationToken cancellationToken)
     {
@@ -63,7 +64,7 @@ public class PaymentsController(IPaymentsRepository paymentsRepository, IPayment
         return payment.Status switch
         {
             PaymentStatus.Rejected => BadRequest(),
-            PaymentStatus.Declined => StatusCode(402), // Payment Required
+            PaymentStatus.Declined => StatusCode(402, new PaymentResponse(payment)), // Payment Required
             _ => new OkObjectResult(new PaymentResponse(payment))
         };
     }

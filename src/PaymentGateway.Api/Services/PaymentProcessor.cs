@@ -61,7 +61,7 @@ public class PaymentProcessor : IPaymentProcessor
                 break;
         }
         
-        _logger.LogDebug("Payment {Id} processed with status {Status}", payment.Id, payment.Status);
+        _logger.LogInformation("Payment {Id} processed with status {Status}", payment.Id, payment.Status);
 
         // TODO: what happens if the payment fails to be added to the repository?
         await _paymentsRepository.Add(payment);
