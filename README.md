@@ -39,13 +39,15 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 3. Encrypt all communications, IE use https etc.
 4. Comply with legal requirements such as GDPR especially when storing card details.
 5. Increase logging, add metrics and general observability.
+6. Use Autofixture or a cleaner way to create test data. Cover more edge cases.
 
 ## Further thoughts
 - Should this API be aware of a merchant? At least an Id might be good for future reference.
+- Should processing a payment be idempotent? Currently multiple requests would perform a new payment which may not be intentional. 
 - Should the API expose payment validation errors? For now this is just documented in the swagger docs.
 - Versioning the Api - This would allow us to make updates to the API without breaking existing clients.
 - Consider the implications of a payment processing but not being able to store the payment. IE storage error.
-- Testing requires the bank simulator to be running. This could be swapped out for a mock or stub. Also we should be running these as part of the build pipeline.
+- Testing requires the bank simulator to be running, this should either be run in the build pipeline or could be swapped out for a mock or stub.
 
 ## Steps Taken
 1. Solidify current implementation of retrieving payment:
