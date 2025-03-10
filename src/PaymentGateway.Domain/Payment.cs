@@ -4,11 +4,11 @@ namespace PaymentGateway.Domain;
 
 public sealed class Payment
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get; }
     public Guid? AuthorizationCode { get; private set; }
     public PaymentStatus Status { get; private set; }
-    public CardDetails CardDetails { get; private set; }
-    public Money Amount { get; private set; }
+    public CardDetails CardDetails { get; }
+    public Money Amount { get;}
 
     public Payment(CardDetails cardDetails, Money amount)
     {

@@ -54,8 +54,13 @@ public class PaymentsController(IPaymentsRepository paymentsRepository, IPayment
     {
         if (!ModelState.IsValid)
         {
+            List<string> errorMessages = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
             logger.LogInformation("Invalid model state");
-            return BadRequest();
+            return BadRequest(new { Errors = errorMessages });
         }
         
         Payment payment = await paymentProcessor.ProcessPayment(request.ToCardDetails(), request.ToMoney(), cancellationToken);

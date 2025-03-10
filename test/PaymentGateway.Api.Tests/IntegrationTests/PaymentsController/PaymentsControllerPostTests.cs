@@ -10,7 +10,10 @@ public class PaymentsControllerPostTests : IntegrationTestBase
     public async Task Post_WithValidPaymentRequest_ReturnsPaymentResponse()
     {
         // Arrange
-        PostPaymentRequest paymentRequest = new("2222405343248877", _random.Next(1, 12), _random.Next(2023, 2030),
+        DateTime utcNow = DateTime.UtcNow;
+        DateTime dateInFuture = utcNow.AddYears(1);
+        
+        PostPaymentRequest paymentRequest = new("2222405343248877", _random.Next(1, 12), dateInFuture.Year,
             "123", "GBP", _random.Next(1, 10000));
         
         // Act

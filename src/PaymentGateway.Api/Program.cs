@@ -1,4 +1,8 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
+
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -6,13 +10,21 @@ using Microsoft.OpenApi.Models;
 using PaymentGateway.Adapters;
 using PaymentGateway.Api;
 using PaymentGateway.Api.Controllers;
+using PaymentGateway.Api.Validators;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.AddAdapters(builder.Configuration);
 builder.Services.AddPaymentGatewayServices();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<PostPaymentRequestValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

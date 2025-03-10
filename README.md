@@ -23,9 +23,9 @@ Feel free to change the structure of the solution, use a different test library 
 
 ## Assumptions
 - Based on the test description of the acquiring bank "It also performs some validation of the card information and then sends the payment details to the appropriate 3rd party organization for processing" it looks like
-the acquiring bank reaches out to other third parties for us. Therefore I have assumed we don't need multiple implementations of acquiring banks, ideally I would clarify this as part of refinement/ discovery.
+the acquiring bank reaches out to other third parties for us. Therefore, I have assumed we don't need multiple implementations of acquiring banks, ideally I would clarify this as part of refinement/ discovery.
 
-## Design Considerations
+## Design Considerations~~~~
 1. Domain Driven Design - I have opted to use a DDD approach to keep the project align with business objectives.
 2. Clean Architecture - A clean architecture approach helps keep the project maintainable and testable.
 3. Adapter Pattern - The adapter pattern is used to abstract the acquiring bank away from the main project. This allows us to swap out the acquiring bank if or when needed.
@@ -39,12 +39,11 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 3. Encrypt all communications, IE use https etc.
 4. Comply with legal requirements such as GDPR especially when storing card details.
 5. Increase logging, add metrics and general observability.
-6. Use Autofixture or a cleaner way to create test data. Cover more edge cases.
+6. Use Autofixture or a cleaner way to create test data. Cover edge cases.
 
 ## Further thoughts
 - Should this API be aware of a merchant? At least an Id might be good for future reference.
-- Should processing a payment be idempotent? Currently multiple requests would perform a new payment which may not be intentional. 
-- Should the API expose payment validation errors? For now this is just documented in the swagger docs.
+- Should processing a payment be idempotent? Currently multiple requests would perform a new payment which may not be intentional.
 - Versioning the Api - This would allow us to make updates to the API without breaking existing clients.
 - Consider the implications of a payment processing but not being able to store the payment. IE storage error.
 - Testing requires the bank simulator to be running, this should either be run in the build pipeline or could be swapped out for a mock or stub.
@@ -57,7 +56,7 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
    - Refactor tests to share setup code. Rename to comply with "UnitOfWork_StateUnderTest_ExpectedBehavior". Install FluentAssertions (my preference).
    - Correct namespace of PaymentStatus.
    - Add test to confirm "Status must be one of the following values Authorized, Declined".
-   - Implement "Status must be one of the following values Authorized, Declined".
+   - Protect against returning rejected payments "Status must be one of the following values Authorized, Declined".
    - Switch response model from "PostPaymentResponse" to "GetPaymentResponse" which seems to be more logical based on the project structure.
    - Update GetPaymentResponse access modifiers to make this model less susceptible to misuse.
    - Added built in logging via `.AddLogging()`. There are other options available such as serilog etc but this can be considered later.
@@ -82,5 +81,5 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 5. Implement the process payment endpoint:
    - Get the integration tests working using the bank simulator.
    - Add in basic validation for the model.
-   - Add in fluent validation to validate the payment. We need to separate this from the controller in case the payment is rejected.
+   - Add in fluent validation to validate the payment request.
    - Updated Readme.
