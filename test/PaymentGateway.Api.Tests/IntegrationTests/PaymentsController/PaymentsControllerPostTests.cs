@@ -1,11 +1,21 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+using Microsoft.AspNetCore.Mvc;
+
 using PaymentGateway.Api.Models.Requests;
 
 namespace PaymentGateway.Api.Tests.IntegrationTests.PaymentsController;
 
 public class PaymentsControllerPostTests : IntegrationTestBase
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new (JsonSerializerOptions.Default)
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+    
     [Fact]
     public async Task Post_WithValidPaymentRequest_ReturnsPaymentResponse()
     {
@@ -18,7 +28,7 @@ public class PaymentsControllerPostTests : IntegrationTestBase
         
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync(BaseUrl, paymentRequest);
-        PaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>();
+        PaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>(_jsonSerializerOptions);
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

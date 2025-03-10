@@ -1,5 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 using PaymentGateway.Api.Models.Enums;
 using PaymentGateway.Domain;
 
@@ -7,6 +10,12 @@ namespace PaymentGateway.Api.Tests.IntegrationTests.PaymentsController;
 
 public class PaymentsControllerGetTests : IntegrationTestBase
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new (JsonSerializerOptions.Default)
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    
     [Theory]
     [InlineData(PaymentStatus.Authorized)]
     [InlineData(PaymentStatus.Declined)]
@@ -30,7 +39,7 @@ public class PaymentsControllerGetTests : IntegrationTestBase
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"{BaseUrl}/{payment.Id}");
-        PaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>();
+        PaymentResponse? paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>(_jsonSerializerOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
