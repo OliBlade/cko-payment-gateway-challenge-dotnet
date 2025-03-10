@@ -48,12 +48,13 @@ the acquiring bank reaches out to other third parties for us. Therefore I have a
 - Versioning the Api - This would allow us to make updates to the API without breaking existing clients.
 - Consider the implications of a payment processing but not being able to store the payment. IE storage error.
 - Testing requires the bank simulator to be running, this should either be run in the build pipeline or could be swapped out for a mock or stub.
+- Load testing - This would be a good idea to ensure the API can handle the expected load.
+- Cancellation token - Should we be able to cancel a payment processing request? What are the implications of this?
 
-## Steps Taken
+## Ste[.editorconfig](.editorconfig)ps Taken
 1. Solidify current implementation of retrieving payment:
    - Satisfy existing tests - Add missing requirement to return not found if payment does not exist.
    - Refactor tests to share setup code. Rename to comply with "UnitOfWork_StateUnderTest_ExpectedBehavior". Install FluentAssertions (my preference).
-   - Tweak a couple of editorconfig settings to show types where ambiguous. IMO this is easier to read especially with nullables.
    - Correct namespace of PaymentStatus.
    - Add test to confirm "Status must be one of the following values Authorized, Declined".
    - Implement "Status must be one of the following values Authorized, Declined".

@@ -16,8 +16,7 @@ public class AcquiringBankAdapter(HttpClient client) : IAcquiringBankAdapter
         
         HttpResponseMessage response = await client.PostAsJsonAsync(PaymentsUri, request, cancellationToken);
         response.EnsureSuccessStatusCode();
-
-        var stringContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        
         ProcessPaymentResponse? processPaymentResponse = await response.Content.ReadFromJsonAsync<ProcessPaymentResponse>(cancellationToken);
         if (processPaymentResponse == null)
         {
